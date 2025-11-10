@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Image from "next/image";
-import styles from  './barang/barang.module.css'
+import styles from "./barang/barang.module.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +30,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <header className={styles.header}>
-          <Image src={"/images/logo.png"} alt="Logo UTI" width={320} height={60} priority />
+          <Image
+            src={"/images/logo.png"}
+            alt="Logo UTI"
+            width={320}
+            height={60}
+            priority
+          />
         </header>
         <main>{children}</main>
-        <footer className={styles.footer}>
-          &copy; 2024 - RADITYA AHMAD
-        </footer>
+        <footer className={styles.footer}>&copy; 2024 - Denii</footer>
       </body>
     </html>
   );
