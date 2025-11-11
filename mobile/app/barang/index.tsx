@@ -1,6 +1,15 @@
 import { View, StyleSheet, FlatList } from "react-native";
-import React, { useEffect, useState } from "react";
-import { Button, Card, Dialog, FAB, Portal, Text, TextInput } from "react-native-paper";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Button,
+  Card,
+  Dialog,
+  FAB,
+  Portal,
+  Snackbar,
+  Text,
+  TextInput,
+} from "react-native-paper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import axios from "axios";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
@@ -14,6 +23,12 @@ export default function BarangViewPage() {
 
   const hideDialog = () => setVisible(false);
 
+  const [visibleSnackbar, setVisibleSnackbar] = React.useState(false);
+
+  const showSnackbar = () => setVisibleSnackbar(true);
+
+  const hideSnackbar = () => setVisibleSnackbar(false);
+
   // buat react hook (useState)
   const [data, setData] = useState<
     { id: number; kode: string; name: string; harga: string; satuan: string }[]
@@ -23,6 +38,13 @@ export default function BarangViewPage() {
   const [search, setSearch] = useState("");
   // state untuk filter data (hasil pencarian)
   const [filter, setFilter] = useState<typeof data>([]);
+  // state untuk simpan id barang
+  const [id, setId] = useState(0);
+
+  // buat useRef untuk menampilkan pesan hapus data
+  const message = useRef("");
+  // buat useRef untuk menampilkan pesan hapus data
+  const messageResponse = useRef("");
 
   // buat react hook (useEffect)
   useEffect(() => {
@@ -59,6 +81,30 @@ export default function BarangViewPage() {
     // console.log(response.data.barang);
     setData(response.data.barang);
   };
+
+  // buat pesan untuk hapus data
+  const setMessage = (text: string) => {
+    message.current = "Data Barang:" + text + "ingin dihapus ?";
+  };
+
+  // buat fungsi untuk hapus data
+    
+  const deleteDataBarang = async (id: number) => {
+    try {
+
+      const response = await axios.delete(
+        `http://10.0.2.2:3001/api/barang/${id}`
+      );
+      messageResponse.current = response.data.message;
+      setVisibleSnackbar(true);
+    }
+    finally {
+      hideDialog();
+    }
+  };
+
+    // tampilkan respon (message)
+    // console.log(response.data.message);
 
   return (
     <View
@@ -118,7 +164,11 @@ export default function BarangViewPage() {
             />
             <Card.Actions>
               <Button
-                onPress={showDialog}
+                onPress={() => {
+                  setId(item.id);
+                  showDialog();
+                  setMessage(item.name);
+                }}
                 style={{ backgroundColor: "white" }}
               >
                 <MaterialIcons
@@ -151,15 +201,26 @@ export default function BarangViewPage() {
 
       <Portal>
         <Dialog visible={visible} onDismiss={hideDialog}>
-          <Dialog.Title>Alert</Dialog.Title>
+          <Dialog.Title>Konfirmasi</Dialog.Title>
           <Dialog.Content>
-            <Text variant="bodyMedium">This is simple dialog</Text>
+            <Text variant="bodyMedium">{message.current}</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialog}>Done</Button>
+            <Button onPress={hideDialog}>Batal</Button>
+            <Button
+              onPress={() => {
+                deleteDataBarang(id);
+              }}
+            >
+              Hapus
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
+
+      <Snackbar visible={visibleSnackbar} onDismiss={hideSnackbar}>
+        {messageResponse.current}
+      </Snackbar>
     </View>
   );
 }
