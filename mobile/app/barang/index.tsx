@@ -15,6 +15,8 @@ import axios from "axios";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
 import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import { Strings } from "@/constants/strings";
+import { formatRupiah } from "@/utils/scripts";
 
 export default function BarangViewPage() {
   const [visible, setVisible] = React.useState(false);
@@ -31,7 +33,7 @@ export default function BarangViewPage() {
 
   // buat react hook (useState)
   const [data, setData] = useState<
-    { id: number; kode: string; name: string; harga: string; satuan: string }[]
+    { id: number; kode: string; name: string; harga: number; satuan: string }[]
   >([]);
 
   // state untuk pencarian
@@ -77,7 +79,7 @@ export default function BarangViewPage() {
 
   // buat fungsi koneksi API dengan axios
   const getDataBarang = async () => {
-    const response = await axios.get("http://10.0.2.2:3001/api/barang");
+    const response = await axios.get(Strings.api_barang);
     // console.log(response.data.barang);
     setData(response.data.barang);
   };
@@ -93,7 +95,7 @@ export default function BarangViewPage() {
     try {
 
       const response = await axios.delete(
-        `http://10.0.2.2:3001/api/barang/${id}`
+        `${Strings.api_barang}/${id}`
       );
       messageResponse.current = response.data.message;
       setVisibleSnackbar(true);
@@ -127,7 +129,7 @@ export default function BarangViewPage() {
       {/* area header */}
       <Text style={[styles.warna_bg, styles.jarak, { textAlign: "center" }]}>
         Halaman View Barangg
-      </Text>
+      </Text> 
 
       {/* area pencarian */}
       <TextInput
@@ -159,7 +161,7 @@ export default function BarangViewPage() {
           <Card key={item.id} style={styles.Card}>
             <Card.Title
               title={item.name}
-              subtitle={item.harga}
+              subtitle={formatRupiah(item.harga)}
               titleStyle={{ fontSize: 20 }}
             />
             <Card.Actions>
@@ -223,7 +225,7 @@ export default function BarangViewPage() {
       </Snackbar>
     </View>
   );
-}
+} 
 
 // bagian css (styling)
 // untuk satuan menggunakan Dp bukan piksel
