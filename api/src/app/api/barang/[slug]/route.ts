@@ -37,7 +37,7 @@ export const DELETE = async (
 
   // tampilkan respon
   return NextResponse.json({
-    message: "Data Barang Berhhasil Dihapus",
+    message: "Data Barang Berhasil Dihapus",
     success: true,
   });
 };
@@ -49,7 +49,7 @@ export const PUT = async (
 ) => {
   const data = await request.json();
   // cek apakah data barang ditemukan
-  const check = await prisma.tb_barang.findFirst({
+  const check = await prisma.tb_barang.find First({
     where: {
       kode: data.kode,
       id: {
